@@ -1,0 +1,42 @@
+
+services:
+  php:
+    build:
+      context: .
+      target: php-prod
+    environment:
+      DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASS}@database:5432/${DATABASE_NAME}?serverVersion=${DATABASE_VERSION}&charset=utf8
+      MAILER_DSN: smtp://mailer:1025
+      MESSENGER_TRANSPORT_DSN: doctrine://default?auto_setup=0
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: .
+      target: nginx-prod
+    ports:
+      - "${APP_PORT:-80}:80"
+    depends_on:
+      - php
+    restart: unless-stopped
+
+  database:
+    image: postgres:${DATABASE_VERSION}-alpine
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASS}
+      POSTGRES_USER: ${DATABASE_USER}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${DATABASE_NAME}", "-U", "${DATABASE_USER}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+    restart: unless-stopped
+
+volumes:
+  database_data:
