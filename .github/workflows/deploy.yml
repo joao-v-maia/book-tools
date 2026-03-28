@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /var/www/book-tools
+
+            echo "==> Pulling latest code"
+            git pull origin main
+
+            echo "==> Building images"
+            docker compose -f compose.yaml build
+
+            echo "==> Starting containers"
+            docker compose -f compose.yaml up -d
+
+            echo "==> Running migrations"
+            docker compose -f compose.yaml exec -T php bin/console doctrine:migrations:migrate --no-interaction
+
+            echo "==> Done"
