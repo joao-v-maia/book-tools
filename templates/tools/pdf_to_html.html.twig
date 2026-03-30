@@ -388,6 +388,30 @@
       box-shadow: none;
     }
 
+    /* ── STATUS MESSAGE ─────────────────────────────────────────────── */
+    .status-msg {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: .88rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-msg--success {
+      background: var(--sage-lt, #d4eadb);
+      color: var(--sage, #4a7c59);
+      border: 1px solid color-mix(in srgb, var(--sage, #4a7c59) 25%, transparent);
+    }
+
+    .status-msg--error {
+      background: var(--rose-lt);
+      color: var(--rose);
+      border: 1px solid color-mix(in srgb, var(--rose) 25%, transparent);
+    }
+
     /* ── FOOTER ─────────────────────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
@@ -451,7 +475,7 @@
 
     <!-- Form -->
     <div class="form-card">
-      <form action="{{ path('app_tools_pdf_to_html_submit') }}"
+      <form action="{{ path('tools.pdf-to-html.convert') }}"
             method="post"
             enctype="multipart/form-data"
             data-controller="pdf-upload"
@@ -500,6 +524,9 @@
         </p>
 
         <div class="file-list" data-pdf-upload-target="list" hidden></div>
+
+        <!-- Status -->
+        <div data-pdf-upload-target="status" hidden></div>
 
         <!-- Submit -->
         <div class="form-footer">

@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import Sortable from 'sortablejs'
 
 export default class extends Controller {
-    static targets = ['input', 'list', 'empty', 'submit', 'dropzone']
+    static targets = ['input', 'list', 'empty', 'submit', 'dropzone', 'status']
 
     #files = new Map()
     #order = []
@@ -46,24 +46,42 @@ export default class extends Controller {
         this.#render()
     }
 
-    submit(event) {
+    async submit(event) {
         event.preventDefault()
         if (this.#order.length === 0) return
 
         const formData = new FormData()
-        this.#order.forEach(id => formData.append('pdfs[]', this.#files.get(id)))
+        this.#order.forEach(id => formData.append('files[]', this.#files.get(id)))
 
         this.submitTarget.disabled = true
         this.submitTarget.textContent = 'Processing…'
+        this.#clearStatus()
 
-        fetch(this.element.action, { method: 'POST', body: formData })
-            .then(r => r.json())
-            .then(data => console.log('Submitted:', data))
-            .catch(err => console.error(err))
-            .finally(() => {
-                this.submitTarget.disabled = false
-                this.submitTarget.textContent = 'Convert to HTML'
-            })
+        try {
+            const response = await fetch(this.element.action, { method: 'POST', body: formData })
+
+            if (!response.ok) {
+                const data = await response.json()
+                this.#showStatus('error', data.error ?? 'Conversion failed.')
+                return
+            }
+
+            const blob = await response.blob()
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'converted.html'
+            a.click()
+            URL.revokeObjectURL(url)
+
+            this.#showStatus('success', 'Conversion successful — your download has started.')
+            this.#reset()
+        } catch (err) {
+            this.#showStatus('error', 'Network error — please try again.')
+        } finally {
+            this.submitTarget.disabled = false
+            this.submitTarget.textContent = 'Convert to HTML'
+        }
     }
 
     #addFiles(files) {
@@ -129,6 +147,22 @@ export default class extends Controller {
         }).join('')
 
         this.#initSortable()
+    }
+
+    #reset() {
+        this.#files.clear()
+        this.#order = []
+        this.#render()
+    }
+
+    #showStatus(type, message) {
+        this.statusTarget.hidden = false
+        this.statusTarget.innerHTML = `<div class="status-msg status-msg--${type}">${this.#escapeHtml(message)}</div>`
+    }
+
+    #clearStatus() {
+        this.statusTarget.hidden = true
+        this.statusTarget.innerHTML = ''
     }
 
     #escapeHtml(str) {
