@@ -153,10 +153,13 @@
       line-height: 1.7;
     }
 
+    /* ── MAIN ───────────────────────────────────────────────────────── */
+    main { padding-bottom: 80px; }
+
     /* ── FORM CARD ──────────────────────────────────────────────────── */
     .form-card {
       background: #fff;
-      border: 1px solid var(--border);
+      border: 1px solid var(--rose-lt);
       border-radius: var(--radius);
       padding: 32px;
       position: relative;
@@ -210,16 +213,16 @@
       gap: 6px;
       padding: 9px 20px;
       border-radius: 8px;
-      border: 1px solid var(--border);
+      border: 1px solid var(--rose-lt);
       background: var(--page);
       font-size: .88rem;
       font-weight: 600;
-      color: var(--ink);
+      color: var(--rose);
       cursor: pointer;
       transition: background .15s, border-color .15s;
     }
 
-    .btn-browse:hover { background: var(--cream); border-color: var(--ink-soft); }
+    .btn-browse:hover { background: var(--rose-lt); border-color: var(--rose); }
 
     .file-input { display: none; }
 
@@ -272,7 +275,7 @@
       transition: box-shadow .15s, border-color .15s;
     }
 
-    .file-item:hover { border-color: #c8c4ba; box-shadow: 0 2px 8px var(--shadow); }
+    .file-item:hover { border-color: var(--rose-lt); box-shadow: 0 2px 8px var(--shadow); }
 
     .file-item--ghost {
       opacity: .4;
@@ -366,19 +369,19 @@
       padding: 12px 28px;
       border-radius: 10px;
       border: none;
-      background: var(--ink);
-      color: var(--page);
+      background: var(--rose);
+      color: #fff;
       font-size: .95rem;
       font-weight: 600;
       cursor: pointer;
       transition: background .15s, transform .15s, box-shadow .15s;
-      box-shadow: 0 4px 18px var(--shadow);
+      box-shadow: 0 4px 18px rgba(155,79,114,.2);
     }
 
     .btn-submit:hover:not(:disabled) {
-      background: var(--ink-soft);
+      background: #883060;
       transform: translateY(-1px);
-      box-shadow: 0 8px 28px rgba(26,26,46,.18);
+      box-shadow: 0 8px 28px rgba(155,79,114,.3);
     }
 
     .btn-submit:disabled {
