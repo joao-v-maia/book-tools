@@ -8,6 +8,7 @@ services:
       APP_ENV: dev
       APP_DEBUG: "1"
       XDEBUG_MODE: "${XDEBUG_MODE:-off}"
+      OPCACHE_VALIDATE_TIMESTAMPS: "1"
     volumes:
       - .:/var/www/html:cached
     extra_hosts:
