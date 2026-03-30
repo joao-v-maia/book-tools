@@ -417,20 +417,57 @@
 
     /* ── FOOTER ─────────────────────────────────────────────────────── */
     footer {
-      border-top: 1px solid var(--border);
-      padding: 32px 0;
       margin-top: auto;
+      background: var(--ink);
+      color: var(--page);
+    }
+
+    .footer-band {
+      background: var(--rose);
+      height: 4px;
     }
 
     .footer-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 24px;
       flex-wrap: wrap;
+      padding: 32px 0;
     }
 
-    .footer-copy { font-size: .83rem; color: #9e9c96; }
+    .footer-copy {
+      font-size: .83rem;
+      color: rgba(250,249,246,.55);
+    }
+
+    .footer-copy a {
+      color: var(--rose-lt);
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .footer-copy a:hover { color: #fff; }
+
+    .footer-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      padding: 5px 12px;
+      border-radius: 7px;
+      font-size: .83rem;
+      color: rgba(250,249,246,.55);
+      text-decoration: none;
+      transition: background .15s, color .15s;
+    }
+
+    .footer-links a:hover {
+      background: rgba(250,249,246,.08);
+      color: var(--page);
+    }
 
     @media (max-width: 600px) {
       .form-card { padding: 20px 16px; }
@@ -556,9 +593,17 @@
 
 <!-- FOOTER -->
 <footer>
+  <div class="footer-band"></div>
   <div class="container" style="max-width: 1120px;">
     <div class="footer-inner">
-      <div class="footer-copy">© {{ "now"|date("Y") }} Book Tools — built for authors, by an author.</div>
+      <div class="footer-copy">
+        © {{ "now"|date("Y") }} Book Tools — built for authors, by <a href="https://joaomaia.dev" target="_blank" rel="noopener">an author</a>.
+      </div>
+      <ul class="footer-links">
+        <li><a href="{{ path('app_home') }}#tools">Tools</a></li>
+        <li><a href="{{ path('app_home') }}#philosophy">About</a></li>
+        <li><a href="https://github.com/joao-v-maia/book-tools" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
     </div>
   </div>
 </footer>
