@@ -1,4 +1,29 @@
 # =============================================================================
+# pdf2htmlEX builder — compiles from source on Alpine
+# Kept as a separate stage so build tools never end up in the PHP image.
+# This stage is slow on the first build but fully cached afterwards.
+# =============================================================================
+FROM alpine:3.21 AS pdf2htmlex-builder
+
+RUN apk add --no-cache bash git sudo openjpeg-dev glib-dev \
+    && printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/msgfmt \
+    && chmod +x /usr/local/bin/msgfmt
+
+# GCC looks up CPATH automatically, even when invoked via cmake/make.
+# Needed because pdf2htmlEX's cmake doesn't propagate glib's include path
+# to ffw.c which pulls in fontforge headers that include <gio/gio.h>.
+ENV CPATH=/usr/include/glib-2.0:/usr/lib/glib-2.0/include
+
+RUN git clone --depth 1 https://github.com/pdf2htmlEX/pdf2htmlEX.git /pdf2htmlEX
+
+WORKDIR /pdf2htmlEX
+
+RUN sed -i '/define nullptr/d' \
+        pdf2htmlEX/src/ArgParser.h \
+        pdf2htmlEX/src/util/const.h \
+    && ./buildScripts/buildInstallLocallyAlpine
+
+# =============================================================================
 # PHP base — shared between dev and prod
 # =============================================================================
 FROM php:8.3-fpm-alpine AS php-base
@@ -6,10 +31,20 @@ FROM php:8.3-fpm-alpine AS php-base
 RUN apk add --no-cache \
         acl \
         bash \
+        cairo \
         fcgi \
         file \
+        fontconfig \
         gettext \
         git \
+        glib \
+        libjpeg-turbo \
+        libpng \
+        libstdc++ \
+        libxml2 \
+        openjpeg \
+        qpdf \
+        ttf-freefont \
     && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         icu-dev \
@@ -29,6 +64,10 @@ RUN apk add --no-cache \
     )" \
     && apk add --no-cache --virtual .phpexts-rundeps $runDeps \
     && apk del .build-deps
+
+# Copy pdf2htmlEX binary and data files from the builder stage
+COPY --from=pdf2htmlex-builder /usr/local/bin/pdf2htmlEX /usr/local/bin/pdf2htmlEX
+COPY --from=pdf2htmlex-builder /usr/local/share/pdf2htmlEX /usr/local/share/pdf2htmlEX
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
