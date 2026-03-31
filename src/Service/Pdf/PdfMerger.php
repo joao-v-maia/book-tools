@@ -20,7 +20,7 @@ class PdfMerger
      */
     public function merge(array $files): File
     {
-        $id = uniqid(true);
+        $id = uniqid("", true);
 
         $output = $this->storage->path("$id.pdf");
 
