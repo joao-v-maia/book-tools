@@ -2,13 +2,14 @@
 
 namespace App\Service\Pdf;
 
-use App\Storage\TemporaryStorage;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
-class PdfConverter {
-    public function html(File $source): File {
+class PdfConverter
+{
+    public function html(File $source): File
+    {
         $filename = Path::getFilenameWithoutExtension($source->getFilename());
         $basedir = Path::getDirectory($source->getPathname());
 

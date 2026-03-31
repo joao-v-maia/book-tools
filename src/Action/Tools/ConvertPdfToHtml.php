@@ -17,9 +17,8 @@ class ConvertPdfToHtml extends AbstractController
     public function __invoke(
         Request $request,
         PdfMerger $merger,
-        PdfConverter $converter
-    ): BinaryFileResponse | JsonResponse
-    {
+        PdfConverter $converter,
+    ): BinaryFileResponse|JsonResponse {
         /** @var array<UploadedFile> $files */
         $files = $request->files->get('files', []);
 
@@ -27,7 +26,7 @@ class ConvertPdfToHtml extends AbstractController
             return $this->json(['error' => 'Invalid file upload'], 400);
         }
 
-        if (count($files) === 0) {
+        if (0 === count($files)) {
             return $this->json(['error' => 'No file uploaded'], 400);
         }
 
