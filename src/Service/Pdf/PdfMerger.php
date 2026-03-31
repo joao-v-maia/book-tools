@@ -16,6 +16,8 @@ class PdfMerger
     /**
      * Merge multiple PDF files into a single PDF using qpdf.
      *
+     * @param File[] $files an array of File objects representing the PDF files to merge
+     *
      * @return File the file resulting from the merge
      */
     public function merge(array $files): File
