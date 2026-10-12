@@ -22,7 +22,7 @@ class PdfConverter
             $source->getPathname(),
             $outputFilename,
         ]);
-        $converter->run();
+        $converter->mustRun();
 
         return new File($output);
     }

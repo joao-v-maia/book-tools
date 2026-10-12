@@ -34,6 +34,7 @@ RUN apk add --no-cache \
         cairo \
         fcgi \
         file \
+        font-liberation \
         fontconfig \
         gettext \
         git \
@@ -83,9 +84,18 @@ FROM php-base AS php-dev
 
 ENV APP_ENV=dev APP_DEBUG=1
 
+# Built from the GitHub release tarball instead of `pecl install`, because
+# pecl.php.net intermittently fails with "does not have REST dependency
+# information available".
+ARG XDEBUG_VERSION=3.5.3
+
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS linux-headers \
-    && pecl install xdebug \
-    && docker-php-ext-enable xdebug \
+    && docker-php-source extract \
+    && mkdir -p /usr/src/php/ext/xdebug \
+    && curl -fsSL "https://github.com/xdebug/xdebug/archive/refs/tags/${XDEBUG_VERSION}.tar.gz" \
+        | tar -xz -C /usr/src/php/ext/xdebug --strip-components=1 \
+    && docker-php-ext-install -j$(nproc) xdebug \
+    && docker-php-source delete \
     && apk del .build-deps
 
 COPY docker/php/xdebug.ini  $PHP_INI_DIR/conf.d/xdebug.ini
